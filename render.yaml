@@ -19,6 +19,11 @@ services:
         sync: false
       - key: VITE_ESIGNET_ACR_VALUES
         sync: false
+      # Frontend and backend are separate Render services with no proxy
+      # between them, so the browser calls the backend's full origin
+      # directly (cross-origin) rather than a same-origin /api/* path.
+      - key: VITE_API_BASE_URL
+        value: https://esignet-backend.onrender.com
       # Runtime (read by nginx via envsubst at container startup).
       - key: BACKEND_ORIGIN
         value: https://esignet-backend.onrender.com
