@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: vue-upload-form
+    runtime: docker
+    dockerfilePath: ./prod.Dockerfile
+    dockerContext: .
+    plan: starter
+    envVars:
+      # Build-time (baked into the JS bundle by Vite) — Render passes these
+      # as Docker build args automatically, matched by name against the
+      # ARGs declared in prod.Dockerfile.
+      - key: VITE_ESIGNET_CLIENT_ID
+        sync: false
+      - key: VITE_ESIGNET_REDIRECT_URI
+        sync: false
+      - key: VITE_ESIGNET_AUTHORIZE_URI
+        sync: false
+      - key: VITE_ESIGNET_SCOPE
+        sync: false
+      - key: VITE_ESIGNET_ACR_VALUES
+        sync: false
+      # Runtime (read by nginx via envsubst at container startup).
+      - key: BACKEND_ORIGIN
+        value: https://esignet-backend.onrender.com

@@ -1,0 +1,217 @@
+:root {
+  color: #252b36;
+  background: #f5f6fb;
+  font-family:
+    "Montserrat", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  background: #f5f6fb;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  align-items: center;
+  background: #073d69;
+  display: flex;
+  height: 86px;
+  justify-content: space-between;
+  padding: 0 46px;
+}
+
+.brand-link {
+  display: inline-flex;
+}
+
+.brand-link img {
+  display: block;
+  height: 52px;
+  object-fit: contain;
+  width: min(255px, 58vw);
+}
+
+.menu-button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  width: 42px;
+}
+
+.menu-button span {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 2px;
+  display: block;
+  height: 3px;
+  width: 28px;
+}
+
+.auth-layout {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08), transparent 42%),
+    radial-gradient(circle at 85% 75%, rgba(19, 113, 79, 0.35), transparent 48%),
+    linear-gradient(135deg, #073d69 0%, #0a5490 55%, #0f2f4f 100%);
+  display: flex;
+  flex: 1;
+  min-height: 560px;
+  position: relative;
+}
+
+.panel {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 48px;
+}
+
+.panel-info .info-content {
+  color: #ffffff;
+  max-width: 420px;
+  text-align: center;
+}
+
+.panel-info h1 {
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 18px;
+}
+
+.panel-info p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.divider {
+  background: #21c37a;
+  box-shadow:
+    0 0 12px 2px rgba(33, 195, 122, 0.85),
+    0 0 32px 6px rgba(33, 195, 122, 0.45);
+  flex-shrink: 0;
+  width: 3px;
+}
+
+.panel-action {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px);
+}
+
+.esignet-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(320px, 100%);
+}
+
+.esignet-plugin {
+  min-height: 52px;
+  width: 100%;
+}
+
+.esignet-plugin > button,
+.esignet-plugin > a {
+  border: 0;
+  border-radius: 7px;
+  display: block;
+  padding: 0;
+  width: 100%;
+}
+
+small {
+  color: #ffd7a8;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.site-footer {
+  align-items: flex-start;
+  background: #303030;
+  color: #ffffff;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 30px 58px 34px;
+}
+
+.site-footer strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.site-footer p,
+.site-footer span {
+  color: rgba(255, 255, 255, 0.88);
+  margin: 8px 0 0;
+}
+
+.site-footer a {
+  color: #ffffff;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    height: 72px;
+    padding: 0 18px;
+  }
+
+  .brand-link img {
+    height: 46px;
+  }
+
+  .auth-layout {
+    flex-direction: column;
+  }
+
+  .panel {
+    padding: 36px 24px;
+  }
+
+  .panel-info h1 {
+    font-size: 1.65rem;
+  }
+
+  .panel-info p {
+    font-size: 1.03rem;
+  }
+
+  .divider {
+    height: 3px;
+    width: 100%;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    padding: 26px 24px 30px;
+  }
+}

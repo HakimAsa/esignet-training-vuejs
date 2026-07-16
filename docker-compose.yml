@@ -1,0 +1,16 @@
+services:
+  vue-upload-form:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_ESIGNET_CLIENT_ID: ${VITE_ESIGNET_CLIENT_ID}
+        VITE_ESIGNET_REDIRECT_URI: ${VITE_ESIGNET_REDIRECT_URI}
+        VITE_ESIGNET_AUTHORIZE_URI: ${VITE_ESIGNET_AUTHORIZE_URI}
+        VITE_ESIGNET_SCOPE: ${VITE_ESIGNET_SCOPE}
+        VITE_ESIGNET_ACR_VALUES: ${VITE_ESIGNET_ACR_VALUES}
+    ports:
+      - '5174:80'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    restart: unless-stopped
