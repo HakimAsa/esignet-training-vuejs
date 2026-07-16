@@ -4,7 +4,7 @@ services:
     runtime: docker
     dockerfilePath: ./prod.Dockerfile
     dockerContext: .
-    plan: starter
+    plan: free
     envVars:
       # Build-time (baked into the JS bundle by Vite) — Render passes these
       # as Docker build args automatically, matched by name against the
