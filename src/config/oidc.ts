@@ -29,15 +29,22 @@ export interface EsignetAuthPreparation {
   nonce: string;
 }
 
+// Empty by default so local dev/Docker Compose keep hitting the same-origin
+// `/api/*` proxy (vite.config.js / nginx.conf). Render's frontend and backend
+// are two independent services with no proxy between them, so the production
+// build sets this to the backend's full origin (e.g. via render.yaml) and
+// calls it directly, cross-origin.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 /**
  * Asks the backend to mint a fresh state/nonce pair for the upcoming eSignet
  * login, so replay/CSRF validation happens server-side against a value the
  * client never gets to choose itself.
  */
 export async function prepareEsignetAuth(): Promise<EsignetAuthPreparation> {
-  const response = await fetch("/api/auth/esignet/prepare", {
+  const response = await fetch(`${API_BASE_URL}/api/auth/esignet/prepare`, {
     cache: "no-store",
-    credentials: "same-origin",
+    credentials: "include",
   });
 
   if (!response.ok) {
