@@ -34,7 +34,7 @@ export interface EsignetAuthPreparation {
 // are two independent services with no proxy between them, so the production
 // build sets this to the backend's full origin (e.g. via render.yaml) and
 // calls it directly, cross-origin.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 /**
  * Asks the backend to mint a fresh state/nonce pair for the upcoming eSignet

@@ -18,6 +18,15 @@ These are Vite `VITE_*` vars, so they're **baked into the JS bundle at build tim
 
 Before showing the eSignet button, the app calls `/api/auth/esignet/prepare` to get a server-issued `state`/`nonce` pair (see [`src/config/oidc.ts`](src/config/oidc.ts)). That path is proxied (both in dev and in Docker) to a backend running on `http://localhost:3000` — no env var needed for local dev, see [Backend proxy](#backend-proxy) below.
 
+## Pages and routing
+
+Client-side routing via `vue-router` (`src/router/index.js`):
+
+- **`/login`** ([`src/views/Login.vue`](src/views/Login.vue)) — renders the official eSignet sign-in button. Shows a message for the query params the backend redirects here with: `?error=<reason>` (OAuth callback failed), `?esignet_required=1` (tried to reach `/dashboard` without a session), `?logged_out=1` (after logout).
+- **`/dashboard`** ([`src/views/Dashboard.vue`](src/views/Dashboard.vue)) — protected. On mount, calls `GET /api/auth/me`; redirects to `/login?esignet_required=1` if that returns 401. Displays `name`/`picture` prominently and lists every other consented claim generically (see `CLAIM_LABELS` in the component for the friendly-name mapping) — no code change needed if the client gets onboarded for a new claim type later.
+
+The backend's OAuth callback redirects here on success (`${FRONTEND_ORIGIN}/dashboard`), matching the ANIP integration guide's convention. Session state itself lives entirely in the backend's `session` cookie — `src/config/session.ts` is the only place this frontend talks to it (`fetchSession()` for reads, `logout()` for a real-navigation logout).
+
 ## Local development (no Docker)
 
 ```bash

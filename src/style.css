@@ -72,6 +72,19 @@ input {
   width: 28px;
 }
 
+.logout-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 9px 18px;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .auth-layout {
   background:
     radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08), transparent 42%),
@@ -151,6 +164,59 @@ small {
   font-weight: 700;
   line-height: 1.4;
   text-align: center;
+}
+
+.route-message {
+  color: #ffffff;
+  font-weight: 600;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.dashboard-loading {
+  align-items: center;
+  color: #073d69;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.dashboard-profile {
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-picture {
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  height: 120px;
+  object-fit: cover;
+  width: 120px;
+}
+
+.panel-action h2 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.claims-list {
+  color: rgba(255, 255, 255, 0.92);
+  display: grid;
+  gap: 4px 16px;
+  grid-template-columns: auto 1fr;
+  margin: 0;
+  max-width: 360px;
+}
+
+.claims-list dt {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.claims-list dd {
+  margin: 0;
 }
 
 .site-footer {
