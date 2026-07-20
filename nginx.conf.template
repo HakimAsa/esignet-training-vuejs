@@ -31,6 +31,27 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Also proxied same-origin, for the same reason as /api/ above — plus a
+    # second one that matters specifically here: onrender.com is on the
+    # Public Suffix List, so this frontend and the backend are different
+    # *sites*, not just different origins. A cookie set via a cross-site
+    # fetch() to the backend directly is a third-party cookie and can be
+    # silently dropped by the browser's tracking protections; proxied through
+    # here, the browser only ever sees this frontend's own origin, so the
+    # esignet_oauth/session cookies are first-party the whole time.
+    # redirect_uri must be set to this frontend's own origin + /auth/callback
+    # (VITE_ESIGNET_REDIRECT_URI / ESIGNET_REDIRECT_URI) for this to apply —
+    # eSignet's browser redirect lands here, not on the backend directly.
+    location /auth/ {
+        proxy_pass ${BACKEND_ORIGIN};
+        proxy_http_version 1.1;
+        proxy_ssl_server_name on;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     # SPA fallback: routes like /callback don't exist as files,
     # they're handled client-side after the esignet redirect.
     location / {
