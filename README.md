@@ -57,11 +57,11 @@ Rebuild after any change to `.env` or source code — `--build` is required, a p
 docker compose up -d --build
 ```
 
-⚠️ `VITE_ESIGNET_REDIRECT_URI` must exactly match the redirect URI registered with your eSignet client. It currently points directly at the backend (`http://127.0.0.1:3000/api/callback`), since the backend — not this frontend — exchanges the OAuth code server-side.
+⚠️ `VITE_ESIGNET_REDIRECT_URI` must exactly match the redirect URI registered with your eSignet client. Locally it can point directly at the backend (`http://127.0.0.1:3000/auth/callback`) — `localhost`/`127.0.0.1` isn't on the Public Suffix List, so frontend and backend are still the same *site* even on different ports, and cookies work normally. This only becomes a problem once deployed — see [Deploying to Render](#deploying-to-render).
 
 ### Backend proxy
 
-The container's nginx proxies `/api/*` to `http://host.docker.internal:3000/*`, i.e. a backend running on the **host** machine (outside Docker) on port 3000. This keeps the browser talking same-origin to `:5174` and avoids CORS. `docker-compose.yml` sets `extra_hosts: host.docker.internal:host-gateway` so the container can resolve the host on Linux.
+The container's nginx proxies both `/api/*` and `/auth/*` to `http://host.docker.internal:3000/*`, i.e. a backend running on the **host** machine (outside Docker) on port 3000. This keeps the browser talking same-origin to `:5174` and avoids CORS. `docker-compose.yml` sets `extra_hosts: host.docker.internal:host-gateway` so the container can resolve the host on Linux.
 
 If the backend moves (different port, or containerized itself), update the `proxy_pass` target in `nginx.conf` (and the dev proxy in `vite.config.js`) accordingly.
 
@@ -71,8 +71,19 @@ Render deployment uses **`prod.Dockerfile`**, not the local `Dockerfile` — the
 
 The backend is already deployed at `https://esignet-backend.onrender.com`, and `render.yaml` sets `BACKEND_ORIGIN` to that URL directly (its public HTTPS endpoint, not Render's internal private networking — that's only usable if both services share the same Render account/region, which isn't assumed here).
 
+### Why redirect_uri must point here, not at the backend
+
+`onrender.com` is on the [Public Suffix List](https://publicsuffix.org/list/) — every tenant subdomain (`vue-upload-form.onrender.com`, `esignet-backend.onrender.com`, ...) is its own *site*, not just a different origin under a shared one. That means a cookie set by the backend in response to a direct cross-site `fetch()` from this frontend is a **third-party cookie**, and browsers increasingly drop those outright regardless of `SameSite`/CORS — which is exactly what caused the "callback never sees the OAuth cookie" failures.
+
+The fix is architectural, not a header: nginx here proxies both `/api/*` and `/auth/*` to the backend (see `nginx.conf.template`), so the browser only ever talks to this frontend's own origin. That requires:
+
+- `VITE_ESIGNET_REDIRECT_URI` = `https://vue-upload-form.onrender.com/auth/callback` (this frontend's own origin, **not** the backend's)
+- The backend's `ESIGNET_REDIRECT_URI` set to the exact same value
+- That exact URL registered with MOSIP/eSignet as this client's redirect_uri
+- `VITE_API_BASE_URL` left empty (see `render.yaml`) so API calls use relative paths, proxied same-origin
+
 1. In the Render dashboard: "New" > "Blueprint", pointing at this repo. It picks up [`render.yaml`](render.yaml) and creates the `vue-upload-form` Web Service using `prod.Dockerfile`.
-2. Render will prompt for the `VITE_*` values (marked `sync: false` in the Blueprint, i.e. not committed to the repo) — same values as your `.env`. Render forwards these to the Docker build automatically (matched against the `ARG`s in `prod.Dockerfile`), so they get baked into the JS bundle.
+2. Render will prompt for the `VITE_*` values (marked `sync: false` in the Blueprint, i.e. not committed to the repo) — same values as your `.env`, except `VITE_ESIGNET_REDIRECT_URI` per the note above. Render forwards these to the Docker build automatically (matched against the `ARG`s in `prod.Dockerfile`), so they get baked into the JS bundle.
 3. Deploy. Render detects the exposed port from `prod.Dockerfile`'s `EXPOSE 80`.
 
 If configuring the service manually instead of via the Blueprint: set the runtime to **Docker**, **Dockerfile Path** to `prod.Dockerfile`, and add `BACKEND_ORIGIN=https://esignet-backend.onrender.com` alongside the `VITE_*` vars.
@@ -83,7 +94,7 @@ If configuring the service manually instead of via the Blueprint: set the runtim
 
 - `Dockerfile` — local Docker Compose build: `node:20-alpine` builds the static site, `nginx:1.27-alpine` serves it, backend reached via `host.docker.internal`
 - `prod.Dockerfile` — Render build: same build stage, but the backend proxy target comes from the `BACKEND_ORIGIN` runtime env var instead
-- `nginx.conf` — static file serving, SPA fallback (`/callback` etc. resolve to `index.html`), `/api` reverse proxy to `host.docker.internal:3000` (used by `Dockerfile`)
+- `nginx.conf` — static file serving, SPA fallback (`/callback` etc. resolve to `index.html`), `/api` and `/auth` reverse proxy to `host.docker.internal:3000` (used by `Dockerfile`)
 - `nginx.conf.template` — same as `nginx.conf`, but with `${BACKEND_ORIGIN}` in place of the hardcoded host (used by `prod.Dockerfile`, rendered via `envsubst` at container startup)
 - `docker-compose.yml` — build args for `VITE_*` vars, port mapping, host networking for the backend proxy
 - `render.yaml` — Render Blueprint for deploying via `prod.Dockerfile`

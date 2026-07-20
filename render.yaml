@@ -11,6 +11,14 @@ services:
       # ARGs declared in prod.Dockerfile.
       - key: VITE_ESIGNET_CLIENT_ID
         sync: false
+      # Must be this frontend's own origin + /auth/callback (e.g.
+      # https://vue-upload-form.onrender.com/auth/callback), NOT the
+      # backend's — nginx proxies /auth/* to the backend server-side (see
+      # nginx.conf.template), so the browser stays on this origin the whole
+      # time. Required because onrender.com is on the Public Suffix List:
+      # this frontend and the backend are different *sites*, so a cookie set
+      # via a direct cross-site call to the backend is third-party and can be
+      # dropped by the browser's tracking protections.
       - key: VITE_ESIGNET_REDIRECT_URI
         sync: false
       - key: VITE_ESIGNET_AUTHORIZE_URI
@@ -19,11 +27,13 @@ services:
         sync: false
       - key: VITE_ESIGNET_ACR_VALUES
         sync: false
-      # Frontend and backend are separate Render services with no proxy
-      # between them, so the browser calls the backend's full origin
-      # directly (cross-origin) rather than a same-origin /api/* path.
+      # Left empty on purpose: nginx now proxies both /api/* and /auth/* to
+      # the backend (see nginx.conf.template), so the browser only ever
+      # talks to this frontend's own origin — no cross-site backend calls,
+      # no third-party cookie problem. Omitting this env var makes the app
+      # fall back to relative paths (see API_BASE_URL in src/config/oidc.ts).
       - key: VITE_API_BASE_URL
-        value: https://esignet-backend.onrender.com
+        value: ""
       # Runtime (read by nginx via envsubst at container startup).
       - key: BACKEND_ORIGIN
         value: https://esignet-backend.onrender.com
